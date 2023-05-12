@@ -39,20 +39,20 @@ try:
     try:
         subprocess.check_call(compile_cmdline)
     except subprocess.CalledProcessError as e:
-        print("Failed to compile file " + in_file + ". Command line:")
+        print(f"Failed to compile file {in_file}. Command line:")
         print()
         print(' '.join(shlex.quote(x) for x in compile_cmdline))
         print()
         sys.exit(55)
-        # To keep the preprocessed file:
-        # os._exit(1)
+            # To keep the preprocessed file:
+            # os._exit(1)
 
     asm_processor.run(asmproc_flags + ['--post-process', out_file, '--assembler', assembler_sh, '--asm-prelude', prelude], functions=functions)
 
-    deps_file = out_file[:-2] + ".asmproc.d"
+    deps_file = f"{out_file[:-2]}.asmproc.d"
     if deps:
         with open(deps_file, "w") as f:
-            f.write(out_file + ": " + " \\\n    ".join(deps) + "\n")
+            f.write(f"{out_file}: " + " \\\n    ".join(deps) + "\n")
             for dep in deps:
                 f.write("\n" + dep + ":\n")
     else:

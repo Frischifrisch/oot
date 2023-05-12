@@ -48,10 +48,8 @@ def CreateAddrLookup(dict, recs, tracer):
 
 def CreateTable():
 
-    vrecs = []
     rrecs = []
-    vrecs.append((PVA(0x80157D90), PVA(0x80800000), None))
-    
+    vrecs = [(PVA(0x80157D90), PVA(0x80800000), None)]
     dict = {
         "va" : {},
         "ra" : {},
@@ -67,14 +65,14 @@ def CreateTable():
             vrecs.append(vrec)
             dict["ft"][li[7]] = (rrec[0], rrec[1])
     file = None
-    
+
     with open("filetable2.txt", "r") as file:
         for line in file:
             li = line.rstrip().split('\t')
             rrec = (int(li[2],16), int(li[3],16), li[5])
             rrecs.append(rrec)
             dict["ft"][li[5]] = (rrec[0], rrec[1])
-    
+
     CreateAddrLookup(dict["va"], vrecs, "va")
     CreateAddrLookup(dict["ra"], rrecs, "ra")
 

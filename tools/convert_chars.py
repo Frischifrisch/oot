@@ -5,31 +5,28 @@ import re
 import sys
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
-root_dir = script_dir + "/../"
+root_dir = f"{script_dir}/../"
 
 
 def handle_match(match):
     original_text = match.group()
-    
+
     match_text = original_text.replace("\\x", "")
 
     if match_text.lower() == "1b":
         return original_text
-    
+
     end = ""
     if original_text.lower().endswith("\\x1b"):
         end = original_text[-4:]
         match_text = match_text[:-2]
-        
+
     try:
         text = bytes.fromhex(match_text).decode("EUC-JP")
     except UnicodeDecodeError:
         return original_text
-    
-    if text[2:].lower() == match_text.lower():
-        return original_text
 
-    return text + end
+    return original_text if text[2:].lower() == match_text.lower() else text + end
 
 
 def process_file(file_path):
@@ -55,7 +52,7 @@ def main():
             if file.endswith(".s") and file not in skip_list:
                 path = os.path.join(root, file)
                 if process_file(path):
-                    print("Processed " + path)
+                    print(f"Processed {path}")
                     i += 1
 
 

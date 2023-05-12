@@ -6,24 +6,28 @@ import re
 from disassemble import get_z_name
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
-root_dir = script_dir + "/../"
-src_dir = root_dir + "src/overlays/"
-asm_dir = root_dir + "asm/non_matchings/overlays/"
+root_dir = f"{script_dir}/../"
+src_dir = f"{root_dir}src/overlays/"
+asm_dir = f"{root_dir}asm/non_matchings/overlays/"
 
 
 def get_c_file_path(file):
-    c_file = get_z_name(file) + ".c"
-    for root, dirs, files in os.walk(src_dir):
-        if c_file in files:
-            return os.path.join(root, c_file)
-    return None
+    c_file = f"{get_z_name(file)}.c"
+    return next(
+        (
+            os.path.join(root, c_file)
+            for root, dirs, files in os.walk(src_dir)
+            if c_file in files
+        ),
+        None,
+    )
 
 
 def handle_file(asm_root, asm_file, c_file_path):
     file_path = os.path.join(asm_root, asm_file)
     with open(file_path) as f:
         file_lines = f.readlines()
-    
+
     new_files = []
     num_rodata = 0
     for i, line in enumerate(file_lines):
@@ -31,7 +35,7 @@ def handle_file(asm_root, asm_file, c_file_path):
         if line.startswith("glabel func"):
             new_files.append((i, line.split(" ")[1].strip() + ".s", "func"))
         elif line.startswith(".section .data"):
-            new_files.append((i, asm_basename + ".data.s", "data"))
+            new_files.append((i, f"{asm_basename}.data.s", "data"))
         elif line.startswith(".section .rodata"):
             type = "rodata"
             ext = ".rodata.s"
@@ -42,7 +46,7 @@ def handle_file(asm_root, asm_file, c_file_path):
 
             new_files.append((i, asm_basename + ext, type))
         elif line.startswith(".bss"):
-            new_files.append((i, asm_basename + ".bss.s", "bss"))
+            new_files.append((i, f"{asm_basename}.bss.s", "bss"))
 
     if len(new_files) == 1:
         return
@@ -53,10 +57,10 @@ def handle_file(asm_root, asm_file, c_file_path):
             new_file_lines = file_lines[new_file[0]:new_files[i+1][0]]
         else:
             new_file_lines = file_lines[new_file[0]:]
-        
+
         with open(os.path.join(asm_root, new_file[1]), mode="w", newline="\n") as out_file:
             out_file.writelines(new_file_lines)
-    
+
     os.remove(c_file_path)
 
     pragma_begin = "#pragma GLOBAL_ASM(\"" + asm_root.split("../")[1] + "/"

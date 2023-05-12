@@ -1,9 +1,8 @@
 import os
 import sys
 
-specFile = open("spec", "r");
-specText = specFile.read();
-specFile.close()
+with open("spec", "r") as specFile:
+    specText = specFile.read();
 specLines = specText.split("\n");
 
 # TODO: CLEAN THIS UP!
@@ -13,7 +12,7 @@ for i in range(0, len(specLines)):
         params = line.split("(")[1].split(")")[0].split(",")
         for j in range(0, len(params)):
             while (params[j].startswith(" ")):
-                params[j] = params[j][1 : len(params[j])]
+                params[j] = params[j][1:]
 
         line = "beginseg\r\n";
         line += "\tname " + params[0] + "\r\n";
@@ -25,7 +24,7 @@ for i in range(0, len(specLines)):
         params = line.split("(")[1].split(")")[0].split(",")
         for j in range(0, len(params)):
             while (params[j].startswith(" ")):
-                params[j] = params[j][1 : len(params[j])]
+                params[j] = params[j][1:]
 
         line = "beginseg\r\n";
         line += "\tname " + params[0] + "\r\n";
@@ -37,7 +36,7 @@ for i in range(0, len(specLines)):
         params = line.split("(")[1].split(")")[0].split(",")
         for j in range(0, len(params)):
             while (params[j].startswith(" ")):
-                params[j] = params[j][1 : len(params[j])]
+                params[j] = params[j][1:]
 
         line = "beginseg\r\n";
         line += "\tname " + params[0] + "\r\n";
@@ -50,6 +49,5 @@ for i in range(0, len(specLines)):
     line += "\r\n";
     specLines[i] = line;
 
-specOut = open("build/spec_preproc", "w");
-specOut.writelines(specLines);
-specOut.close();
+with open("build/spec_preproc", "w") as specOut:
+    specOut.writelines(specLines);
